@@ -1,0 +1,36 @@
+<h1>Cloud System</h1>
+
+<h2>Chat AI</h2>
+<input id="q">
+<button onclick="chat()">Send</button>
+
+<h2>Employees</h2>
+<button onclick="load()">Load</button>
+
+<div id="out"></div>
+
+<script>
+const API = "https://YOUR-WORKER.workers.dev";
+
+async function chat(){
+  let q = document.getElementById("q").value;
+
+  let r = await fetch(API+"/chat", {
+    method:"POST",
+    headers:{
+      "Authorization":"demo"
+    },
+    body: JSON.stringify({question:q})
+  });
+
+  let d = await r.json();
+  document.getElementById("out").innerHTML += "<p>"+d.answer+"</p>";
+}
+
+async function load(){
+  let r = await fetch(API+"/employees");
+  let d = await r.json();
+  document.getElementById("out").innerHTML =
+  JSON.stringify(d);
+}
+</script>
