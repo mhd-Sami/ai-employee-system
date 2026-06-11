@@ -1,36 +1,125 @@
-<h1>Cloud System</h1>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cloud AI System</title>
 
-<h2>Chat AI</h2>
-<input id="q">
-<button onclick="chat()">Send</button>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      padding: 20px;
+    }
 
-<h2>Employees</h2>
-<button onclick="load()">Load</button>
+    .card {
+      background: #1e293b;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
 
-<div id="out"></div>
+    input {
+      padding: 10px;
+      width: 70%;
+      border-radius: 5px;
+      border: none;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #3b82f6;
+      color: white;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    .output {
+      background: #0b1220;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      min-height: 50px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Cloud System (AI + Employee Manager)</h1>
+
+  <!-- CHAT SECTION -->
+  <div class="card">
+    <h2>AI Chat</h2>
+
+    <input id="q" placeholder="Ask something...">
+    <button onclick="chat()">Send</button>
+
+    <div id="chatBox" class="output"></div>
+  </div>
+
+  <!-- EMPLOYEE SECTION -->
+  <div class="card">
+    <h2>Employees</h2>
+
+    <button onclick="loadEmployees()">Load Employees</button>
+
+    <div id="empBox" class="output"></div>
+  </div>
 
 <script>
-const API = "https://YOUR-WORKER.workers.dev";
 
-async function chat(){
-  let q = document.getElementById("q").value;
+const API = "https://YOUR-WORKER.workers.dev"; 
+// ⚠️ REPLACE THIS WITH YOUR REAL WORKER URL
 
-  let r = await fetch(API+"/chat", {
-    method:"POST",
-    headers:{
-      "Authorization":"demo"
-    },
-    body: JSON.stringify({question:q})
-  });
+// ---------------- CHAT ----------------
+async function chat() {
+  const question = document.getElementById("q").value;
 
-  let d = await r.json();
-  document.getElementById("out").innerHTML += "<p>"+d.answer+"</p>";
+  try {
+    const res = await fetch(API + "/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ question })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("chatBox").innerHTML +=
+      `\nYou: ${question}\nAI: ${data.answer}\n-------------------`;
+
+  } catch (err) {
+    document.getElementById("chatBox").innerText =
+      "Error calling AI API. Check Worker URL or CORS.";
+    console.log(err);
+  }
 }
 
-async function load(){
-  let r = await fetch(API+"/employees");
-  let d = await r.json();
-  document.getElementById("out").innerHTML =
-  JSON.stringify(d);
+// ---------------- EMPLOYEES ----------------
+async function loadEmployees() {
+  try {
+    const res = await fetch(API + "/employees");
+    const data = await res.json();
+
+    document.getElementById("empBox").innerText =
+      JSON.stringify(data, null, 2);
+
+  } catch (err) {
+    document.getElementById("empBox").innerText =
+      "Error loading employees.";
+    console.log(err);
+  }
 }
+
 </script>
+
+</body>
+</html>
